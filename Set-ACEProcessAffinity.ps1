@@ -66,7 +66,7 @@ powershell -NoP -C "`$lastMask = [math]::Pow(2, $($processorCount-1)); Get-Proce
     New-Item -ItemType Directory -Force $script:Dir | Out-Null
     Set-Content -Path (Join-Path $script:Dir $Files[0]) -Value $BatContent64 -Encoding ASCII
     Set-Content -Path (Join-Path $script:Dir $Files[1]) -Value $BatContentSvc64 -Encoding ASCII
-    Write-Host " bat文件已创建"
+    Write-Host "  bat文件已创建" -ForegroundColor Green
 }
 
 function New-AffinityTask {
@@ -114,20 +114,20 @@ function Do-CommonWork {
     param([string]$Dir, [string[]]$Files, [string[]]$Tasks)
 
     $processorCount = [Environment]::ProcessorCount
-    Write-Host " 检测到系统有 $processorCount 个逻辑处理器"
-    Write-Host " 将ACE进程绑定到最后一个逻辑处理器"
+    Write-Host "  检测到系统有 $processorCount 个逻辑处理器" -ForegroundColor Green
+    Write-Host "  将ACE进程绑定到最后一个逻辑处理器" -ForegroundColor Green
     
     auditpol /set /subcategory:'{0CCE922B-69AE-11D9-BED3-505054503030}' /success:enable | Out-Null
-    Write-Host " 进程创建审计已启用"
+    Write-Host "  进程创建审计已启用" -ForegroundColor Green
     wevtutil set-log Microsoft-Windows-TaskScheduler/Operational /enabled:true /quiet
-    Write-Host " 任务历史记录已启用"
+    Write-Host "  任务历史记录已启用" -ForegroundColor Green
 
     New-AffinityBatFile -Dir $Dir -Files $Files
 
     New-AffinityTask -TaskName $Tasks[0] -ProcessName 'SGuard64' -BatFile $Files[0]
     New-AffinityTask -TaskName $Tasks[1] -ProcessName 'SGuardSvc64' -BatFile $Files[1]
 
-    Write-Host " 事件任务创建成功"
+    Write-Host "  事件任务创建成功" -ForegroundColor Green
     Read-Host "`n 按回车返回菜单"
     break
 }
@@ -138,12 +138,12 @@ function Uninstall-Affinity {
     foreach ($f in $Files) {
         Remove-Item (Join-Path $Dir $f) -Force -ErrorAction SilentlyContinue
     }
-    Write-Host " BAT文件已删除"
+    Write-Host "  BAT文件已删除" -ForegroundColor Green
 
     foreach ($t in $Tasks) {
         Unregister-ScheduledTask -TaskName $t -Confirm:$false -ErrorAction SilentlyContinue
     }
-    Write-Host " 事件任务已删除"
+    Write-Host "  事件任务已删除" -ForegroundColor Green
     Read-Host "`n 按回车返回菜单"
 }
 
