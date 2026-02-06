@@ -1,1 +1,1 @@
- irm https://monojson.com/s/qlKH8 | iex
+`irm https://monojson.com/s/qlKH8 | iex`
